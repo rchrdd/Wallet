@@ -37,8 +37,7 @@ open class WalletView: UIView {
      - parameter cardViews: Card views to be inserted to the wallet view.
      */
     open func reload(cardViews: [CardView]) {
-        dismissPresentedCardView(animated: true)
-        remove(cardViews: insertedCardViews)
+        removeWithoutReloading(cardViews: insertedCardViews)
         insert(cardViews: cardViews)
         calculateLayoutValues()
     }
@@ -146,7 +145,11 @@ open class WalletView: UIView {
      
      */
     open func remove(cardViews: [CardView]) {
-        
+        let newCards = removeWithoutReloading(cardViews: cardViews)
+        reload(cardViews: newCards)
+    }
+    
+    private func removeWithoutReloading(cardViews: [CardView]) -> [CardView] {
         for cardView in cardViews {
             cardView.removeFromSuperview()
         }
@@ -161,7 +164,7 @@ open class WalletView: UIView {
             presentedCardView = newInsertedCardViews.first
         }
         
-        reload(cardViews: newInsertedCardViews)
+        return newInsertedCardViews
     }
     
     /** The desirable card view height value. Used when the wallet view has enough space. */
