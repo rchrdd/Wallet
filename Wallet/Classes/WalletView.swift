@@ -37,10 +37,10 @@ open class WalletView: UIView {
      - parameter cardViews: Card views to be inserted to the wallet view.
      */
     open func reload(cardViews: [CardView]) {
-        
+        dismissPresentedCardView(animated: true)
+        remove(cardViews: insertedCardViews)
         insert(cardViews: cardViews)
         calculateLayoutValues()
-        
     }
     
     
@@ -146,6 +146,10 @@ open class WalletView: UIView {
      
      */
     open func remove(cardViews: [CardView]) {
+        
+        for cardView in cardViews {
+            cardView.removeFromSuperview()
+        }
         
         let newInsertedCardViews = insertedCardViews.filter { !cardViews.contains($0) }
         
@@ -257,7 +261,7 @@ open class WalletView: UIView {
      */
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        if context == observerContext {
+        if context == &WalletView.observerContext {
             
             if keyPath == #keyPath(UIScrollView.bounds) {
                 layoutWalletView()
@@ -272,12 +276,11 @@ open class WalletView: UIView {
     
     // MARK: Private methods
     
-    private let observerContext = UnsafeMutableRawPointer.allocate(bytes: 4, alignedTo: 1)
+    static var observerContext = 8
     
     deinit {
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.frame))
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.bounds))
-        observerContext.deallocate(bytes: 4, alignedTo: 1)
     }
     
     
@@ -285,8 +288,8 @@ open class WalletView: UIView {
         
         let options: NSKeyValueObservingOptions = [.new, .old, .initial]
         
-        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.frame), options: options, context: observerContext)
-        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.bounds), options: options, context: observerContext)
+        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.frame), options: options, context: &WalletView.observerContext)
+        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.bounds), options: options, context: &WalletView.observerContext)
     }
     
     func prepareScrollView() {
@@ -776,4 +779,3 @@ open class WalletView: UIView {
     }
     
 }
-
