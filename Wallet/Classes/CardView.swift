@@ -44,16 +44,26 @@ open class CardView: UIView {
         }
     }
     
+    var panStartPoint: CGPoint?
+    
     /** This method is called when the card view is panned. */
     @objc open func panned(gestureRecognizer: UIPanGestureRecognizer) {
         
-        switch gestureRecognizer.state {
-        case .began:
-            walletView?.grab(cardView: self, popup: false)
-        case .changed:
-            updateGrabbedCardViewOffset(gestureRecognizer: gestureRecognizer)
-        default:
-            walletView?.releaseGrabbedCardView()
+        if gestureRecognizer.state == .began {
+            panStartPoint = gestureRecognizer.location(in: self)
+        }
+        
+        if panStartPoint!.y - gestureRecognizer.location(in: self).y > 30 {
+            walletView?.dismissPresentedCardView(animated: true)
+        } else {
+            switch gestureRecognizer.state {
+            case .began:
+                walletView?.grab(cardView: self, popup: false)
+            case .changed:
+                updateGrabbedCardViewOffset(gestureRecognizer: gestureRecognizer)
+            default:
+                walletView?.releaseGrabbedCardView()
+            }
         }
         
     }
@@ -77,6 +87,7 @@ open class CardView: UIView {
     let tapGestureRecognizer    = UITapGestureRecognizer()
     let panGestureRecognizer    = UIPanGestureRecognizer()
     let longGestureRecognizer   = UILongPressGestureRecognizer()
+    let swipeGestureRecognizer   = UISwipeGestureRecognizer()
     
     func setupGestures() {
         
@@ -87,6 +98,11 @@ open class CardView: UIView {
         panGestureRecognizer.addTarget(self, action: #selector(CardView.panned(gestureRecognizer:)))
         panGestureRecognizer.delegate = self
         addGestureRecognizer(panGestureRecognizer)
+        
+//        swipeGestureRecognizer.addTarget(self, action: #selector(CardView.swiped(gestureRecognizer:)))
+//        swipeGestureRecognizer.delegate = self
+//        swipeGestureRecognizer.direction = .up
+//        addGestureRecognizer(swipeGestureRecognizer)
         
         longGestureRecognizer.addTarget(self, action: #selector(CardView.longPressed(gestureRecognizer:)))
         longGestureRecognizer.delegate = self
