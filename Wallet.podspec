@@ -19,6 +19,7 @@ Wallet is a replica of the Apple's Wallet interface. Add, delete or present your
   s.author           = { 'Ruslan Shevchuk' => 'inbox@rshevchuk.io' }
   s.source           = { :git => 'https://github.com/rshevchuk/Wallet.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.module_name      = 'WalletPod'
 
   s.ios.deployment_target = '8.0'
 
